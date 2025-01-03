@@ -3,19 +3,20 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"libunrealsymbolicateserver/platform"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
-	"path"
+	"runtime"
+	"strings"
+	"time"
 )
 
 /*
 테스트 방법
 
-curl -X POST http://localhost:8080/upload \
-  -F "file=@~/LastUnhandledCrashStack.xml" \
-  -H "Content-Type: multipart/form-data"
+curl -X POST http://localhost:8080/upload -F "file=@~/LastUnhandledCrashStack.xml" -H "Content-Type: multipart/form-data"
 
  */
 func main() {
@@ -27,25 +28,51 @@ func main() {
 		file, _ := c.FormFile("file")
 		log.Println(file.Filename)
 
-		tempFilePath := path.Join(os.TempDir(), "libunrealsymbolicateserver.tmp")
-
-		err := c.SaveUploadedFile(file, tempFilePath)
+		//goland:noinspection SpellCheckingInspection
+		tempFile, err := os.CreateTemp(os.TempDir(), "libunrealsymbolicateserver-*.tmp")
 		if err != nil {
-			c.String(http.StatusInternalServerError, err.Error());
+			c.String(http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		cmd := "BUILD_NUMBER=1424 cat \"" + tempFilePath + "\" | grep -E \"^ libUnreal \" | cut -d \"+\" -f 2 | ~/Library/Android/sdk/ndk/26.2.11394342/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-addr2line -C -f -e ~/libUnreal.so"
+
+		if err := c.SaveUploadedFile(file, tempFile.Name()); err != nil {
+			c.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+
+		time.Sleep(1 * time.Second)
+
+		cmd := fmt.Sprintf(platform.Cmd, tempFile.Name(), platform.Addr2lineExePath)
 
 		log.Println("Running: " + cmd)
 
-		out, err := exec.Command("zsh","-c",cmd).Output()
+		var out []byte
+		if runtime.GOOS == "windows" {
+			out, err = exec.Command("powershell","-nologo", "-noprofile", cmd).Output()
+		} else {
+			out, err = exec.Command("zsh","-c", cmd).Output()
+		}
+
 		if err != nil {
 			c.String(http.StatusInternalServerError, "Failed to execute command: %s", cmd)
 			return
 		}
 
-		c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!\n%s", file.Filename, string(out)))
+		outStr := string(out)
+		outLines := strings.Split(outStr, "\n")
+
+		combinedStr := ""
+		for i, line := range outLines {
+			combinedStr += line
+			if i != 0 && i % 2 == 0 {
+				combinedStr += "\n"
+			} else {
+				combinedStr += "    "
+			}
+		}
+
+		c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!\n%s", file.Filename, combinedStr))
 	})
 
 	_ = router.Run(":8080")
