@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
 	"libunrealsymbolicateserver/platform"
@@ -98,6 +97,8 @@ func main() {
 		outStr := string(out)
 		outLines := strings.Split(outStr, "\n")
 
+		var data SymbolicateResult
+
 		combinedStr := ""
 		for i := range outLines {
 			if i % 2 != 0 {
@@ -109,10 +110,39 @@ func main() {
 			}
 
 			combinedStr += outLines[i] + "    " + outLines[i + 1] + "\n"
+
+			var function string
+			var args string
+			argIndex := strings.Index(outLines[i], "(")
+			if argIndex >= 0 {
+				function = outLines[i][0:argIndex]
+				args = outLines[i][argIndex:]
+			} else {
+				function = outLines[i]
+			}
+
+			data.Frames = append(data.Frames, Frame{
+				Function: function,
+				Args: args,
+				File:     outLines[i + 1],
+			})
 		}
 
-		c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!\n%s", file.Filename, combinedStr))
+		c.HTML(http.StatusOK, "result.tmpl", data)
 	})
 
+	router.LoadHTMLGlob("templates/*")
+	router.StaticFS("/upload", http.Dir("static"))
+
 	_ = router.Run(":8080")
+}
+
+type Frame struct {
+	Function string
+	Args string
+	File string
+}
+
+type SymbolicateResult struct {
+	Frames []Frame
 }

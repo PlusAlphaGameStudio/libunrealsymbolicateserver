@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Result</title>
+    <style>
+        td.function
+        {
+            max-width: 500px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+<table>
+    {{range $index, $frame := .Frames}}
+    <tr>
+        <td class="function">
+            {{$frame.Function}}
+        </td>
+        <td>
+            {{$frame.File}}
+        </td>
+    </tr>
+    {{end}}
+</table>
+</body>
+</html>
