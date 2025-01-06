@@ -2,5 +2,13 @@
 
 package platform
 
-const Addr2lineExePath = "~/Library/Android/sdk/ndk/26.2.11394342/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-addr2line"
-const LibUnrealPath = "~/libUnreal.so"
+const addr2lineExePath = "~/Library/Android/sdk/ndk/26.2.11394342/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-addr2line"
+const libUnrealPath = "~/libUnreal.so"
+
+func GetAddr2lineExePath() string {
+	return replaceHome(addr2lineExePath)
+}
+
+func GetLibUnrealPath() string {
+	return replaceHome(libUnrealPath)
+}

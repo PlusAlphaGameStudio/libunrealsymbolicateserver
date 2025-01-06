@@ -58,7 +58,7 @@ func main() {
 		}
 
 		var out []byte
-		subProcess := exec.Command(platform.Addr2lineExePath, "-C", "-f", "-e", platform.LibUnrealPath)
+		subProcess := exec.Command(platform.GetAddr2lineExePath(), "-C", "-f", "-e", platform.GetLibUnrealPath())
 		stdinPipe, err := subProcess.StdinPipe()
 		if err != nil {
 			c.String(http.StatusInternalServerError, err.Error())
