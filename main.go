@@ -153,7 +153,7 @@ func main() {
 	router.LoadHTMLGlob("templates/*")
 	router.StaticFS("/uploadCrash", http.Dir("static"))
 
-	_ = router.Run(":8080")
+	_ = router.Run(os.Getenv("SYMBOLICATE_SERVER_ADDR"))
 }
 
 type Frame struct {
