@@ -32,7 +32,7 @@ func main() {
 	router := gin.Default()
 	// Set a lower memory limit for multipart forms (default is 32 MiB)
 	router.MaxMultipartMemory = 8 << 20 // 8 MiB
-	router.POST("/uploadCrash", func(c *gin.Context) {
+	router.POST("/", func(c *gin.Context) {
 		// single file
 		file, _ := c.FormFile("file")
 		log.Println(file.Filename)
@@ -151,7 +151,7 @@ func main() {
 	})
 
 	router.LoadHTMLGlob("templates/*")
-	router.StaticFS("/uploadCrash", http.Dir("static"))
+	router.StaticFS("/", http.Dir("static"))
 
 	_ = router.Run(os.Getenv("SYMBOLICATE_SERVER_ADDR"))
 }
