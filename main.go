@@ -2,13 +2,16 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"io"
 	"libunrealsymbolicateserver/platform"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -21,10 +24,15 @@ curl.exe -X POST http://localhost:8080/upload -F "file=@LastUnhandledCrashStack.
 
  */
 func main() {
+	goDotErr := godotenv.Load()
+	if goDotErr != nil {
+		panic(errors.New("error loading .env file"))
+	}
+
 	router := gin.Default()
 	// Set a lower memory limit for multipart forms (default is 32 MiB)
 	router.MaxMultipartMemory = 8 << 20 // 8 MiB
-	router.POST("/upload", func(c *gin.Context) {
+	router.POST("/uploadCrash", func(c *gin.Context) {
 		// single file
 		file, _ := c.FormFile("file")
 		log.Println(file.Filename)
@@ -50,15 +58,26 @@ func main() {
 			return
 		}
 
+		var buildNumber int64
 		var addrLines []string
 		for _, line := range strings.Split(string(uploadBytes), "\n") {
 			if strings.HasPrefix(line, " libUnreal ") {
 				addrLines = append(addrLines, strings.Split(line, " + ")[1])
 			}
+
+			if strings.HasPrefix(line, "<RipperBuildNumber>") {
+				// '1234 Dev' 또는 '4567 Shi' 등의 값이다. 숫자만 뽑아 온다.
+				buildNumberStr := strings.Split(line[len("<RipperBuildNumber>"):], " ")[0]
+				if buildNumber, err = strconv.ParseInt(buildNumberStr, 10, 32); err != nil {
+					c.String(http.StatusInternalServerError, err.Error())
+					return
+				}
+			}
 		}
 
 		var out []byte
-		subProcess := exec.Command(platform.GetAddr2lineExePath(), "-C", "-f", "-e", platform.GetLibUnrealPath())
+		libUnrealPath := strings.ReplaceAll(os.Getenv("LIB_UNREAL_PATH"), "{BuildNumber}", strconv.FormatInt(buildNumber, 10))
+		subProcess := exec.Command(platform.GetAddr2lineExePath(), "-C", "-f", "-e", libUnrealPath)
 		stdinPipe, err := subProcess.StdinPipe()
 		if err != nil {
 			c.String(http.StatusInternalServerError, err.Error())
@@ -132,7 +151,7 @@ func main() {
 	})
 
 	router.LoadHTMLGlob("templates/*")
-	router.StaticFS("/upload", http.Dir("static"))
+	router.StaticFS("/uploadCrash", http.Dir("static"))
 
 	_ = router.Run(":8080")
 }
