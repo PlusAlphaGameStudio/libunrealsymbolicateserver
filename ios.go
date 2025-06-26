@@ -189,7 +189,7 @@ func symbolicateIos(uploadBytes []byte) ([]byte, error) {
 	// Debug: Print all CallStackEntries
 	log.Println("=== CallStackEntries Debug Output ===")
 	for i, entry := range crashResult.CallStackEntries {
-		log.Printf("[%d] ModuleName: %s, BaseAddress: 0x%x, Offset: 0x%x", 
+		log.Printf("[%d] ModuleName: %s, BaseAddress: 0x%x, Offset: 0x%x",
 			i, entry.ModuleName, entry.BaseAddress, entry.Offset)
 	}
 	log.Println("=== End CallStackEntries Debug Output ===")
@@ -237,7 +237,7 @@ func symbolicateIos(uploadBytes []byte) ([]byte, error) {
 			address := entry.BaseAddress + entry.Offset
 			inputLine = strconv.FormatInt(address, 16)
 		} else {
-			inputLine = "?"
+			inputLine = entry.ModuleName + " [?]"
 		}
 
 		if _, err := io.WriteString(stdinPipe, inputLine+"\n"); err != nil {
