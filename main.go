@@ -222,16 +222,21 @@ func symbolicateAndroid(uploadBytes []byte) ([]byte, error) {
 }
 
 func selfTest(samplePath string) {
-	testTombstoneBytes, err := os.ReadFile(samplePath)
+	sampleBytes, err := os.ReadFile(samplePath)
 	if err != nil {
 		log.Println(err)
+		return
 	}
 
-	resultBytes, err := symbolicate(testTombstoneBytes)
+	resultBytes, err := symbolicate(sampleBytes)
 	if err != nil {
 		log.Println(err)
+		return
 	}
 
+	log.Println("============= " + samplePath + " =============")
+	log.Println(string(sampleBytes))
+	log.Println("============= " + samplePath + " (Result) =============")
 	log.Println(string(resultBytes))
 }
 
