@@ -197,7 +197,16 @@ func symbolicateIos(uploadBytes []byte) ([]byte, error) {
 
 	log.Println("libUnreal path found: " + ripperBinPath)
 
-	subProcess := exec.Command(platform.GetXCRunExePath(), "atos", "-o", ripperBinPath, "-arch", "arm64", "-l")
+	// Find first Ripper entry's BaseAddress
+	var ripperBaseAddress string
+	for _, entry := range crashResult.CallStackEntries {
+		if entry.ModuleName == "Ripper" {
+			ripperBaseAddress = "0x" + strconv.FormatInt(entry.BaseAddress, 16)
+			break
+		}
+	}
+
+	subProcess := exec.Command(platform.GetXCRunExePath(), "atos", "-o", ripperBinPath, "-arch", "arm64", "-l", ripperBaseAddress)
 	stdinPipe, err := subProcess.StdinPipe()
 	if err != nil {
 		return nil, err
