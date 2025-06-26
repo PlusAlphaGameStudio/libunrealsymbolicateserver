@@ -254,8 +254,37 @@ func symbolicateIos(uploadBytes []byte) ([]byte, error) {
 	}
 
 	outBytes := outBytesBuffer.Bytes()
-
-	return outBytes, nil
+	
+	// Process output: split each line into two lines
+	outStr := string(outBytes)
+	lines := strings.Split(outStr, "\n")
+	var processedLines []string
+	
+	for _, line := range lines {
+		if line == "" {
+			continue
+		}
+		
+		// Add the original line
+		processedLines = append(processedLines, line)
+		
+		// Check if line ends with (filename:linenumber) pattern
+		if strings.HasSuffix(line, ")") {
+			// Find the last occurrence of " ("
+			lastParen := strings.LastIndex(line, " (")
+			if lastParen != -1 {
+				fileInfo := line[lastParen+2 : len(line)-1] // Extract content between " (" and ")"
+				processedLines = append(processedLines, fileInfo)
+			} else {
+				processedLines = append(processedLines, "?")
+			}
+		} else {
+			processedLines = append(processedLines, "?")
+		}
+	}
+	
+	processedOutput := strings.Join(processedLines, "\n")
+	return []byte(processedOutput), nil
 }
 
 func parseFGenericCrashContext(xmlData []byte) (*CrashContextResult, error) {
