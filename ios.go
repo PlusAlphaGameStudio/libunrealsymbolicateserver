@@ -237,7 +237,7 @@ func symbolicateIos(uploadBytes []byte) ([]byte, error) {
 			address := entry.BaseAddress + entry.Offset
 			inputLine = strconv.FormatInt(address, 16)
 		} else {
-			inputLine = entry.ModuleName + " [?]"
+			inputLine = entry.ModuleName
 		}
 
 		if _, err := io.WriteString(stdinPipe, inputLine+"\n"); err != nil {
