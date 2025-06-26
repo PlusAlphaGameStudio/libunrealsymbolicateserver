@@ -186,6 +186,14 @@ func symbolicateIos(uploadBytes []byte) ([]byte, error) {
 		return nil, err
 	}
 
+	// Debug: Print all CallStackEntries
+	log.Println("=== CallStackEntries Debug Output ===")
+	for i, entry := range crashResult.CallStackEntries {
+		log.Printf("[%d] ModuleName: %s, BaseAddress: 0x%x, Offset: 0x%x", 
+			i, entry.ModuleName, entry.BaseAddress, entry.Offset)
+	}
+	log.Println("=== End CallStackEntries Debug Output ===")
+
 	libUnrealPath := strings.ReplaceAll(os.Getenv("LIB_UNREAL_PATH"), "{BuildNumber}", strconv.Itoa(crashResult.RipperBuildNumber))
 
 	libZipPath := recursivelyFindDsymZipPathByBuildId(libUnrealPath, crashResult.LibUnrealBuildID)
@@ -207,6 +215,8 @@ func symbolicateIos(uploadBytes []byte) ([]byte, error) {
 	}
 
 	subProcess := exec.Command(platform.GetXCRunExePath(), "atos", "-o", ripperBinPath, "-arch", "arm64", "-l", ripperBaseAddress)
+	log.Println("Running external command: " + subProcess.String())
+
 	stdinPipe, err := subProcess.StdinPipe()
 	if err != nil {
 		return nil, err
@@ -266,12 +276,22 @@ func parseFGenericCrashContext(xmlData []byte) (*CrashContextResult, error) {
 
 		parts := strings.Fields(line)
 		if len(parts) >= 4 && parts[2] == "+" {
-			baseAddr, err := strconv.ParseInt(parts[1], 16, 64)
+			// Handle baseAddr with or without "0x" prefix
+			baseAddrStr := parts[1]
+			if strings.HasPrefix(baseAddrStr, "0x") {
+				baseAddrStr = baseAddrStr[2:]
+			}
+			baseAddr, err := strconv.ParseInt(baseAddrStr, 16, 64)
 			if err != nil {
 				continue
 			}
 
-			offset, err := strconv.ParseInt(parts[3], 16, 64)
+			// Handle offset with or without "0x" prefix
+			offsetStr := parts[3]
+			if strings.HasPrefix(offsetStr, "0x") {
+				offsetStr = offsetStr[2:]
+			}
+			offset, err := strconv.ParseInt(offsetStr, 16, 64)
 			if err != nil {
 				continue
 			}
