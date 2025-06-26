@@ -274,6 +274,8 @@ func symbolicateIos(uploadBytes []byte) ([]byte, error) {
 			lastParen := strings.LastIndex(line, " (")
 			if lastParen != -1 {
 				fileInfo := line[lastParen+2 : len(line)-1] // Extract content between " (" and ")"
+				// Remove the (filename:linenumber) part from the original line
+				processedLines[len(processedLines)-1] = line[:lastParen]
 				processedLines = append(processedLines, fileInfo)
 			} else {
 				processedLines = append(processedLines, "?")
