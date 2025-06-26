@@ -120,6 +120,16 @@ func main() {
 }
 
 func symbolicate(uploadBytes []byte) ([]byte, error) {
+	// Check if it's iOS platform
+	if strings.Contains(string(uploadBytes), "<PlatformName>IOS</PlatformName>") {
+		return symbolicateIos(uploadBytes)
+	}
+	
+	// Default to Android symbolication
+	return symbolicateAndroid(uploadBytes)
+}
+
+func symbolicateAndroid(uploadBytes []byte) ([]byte, error) {
 	var buildNumber int64
 	var addrLines []string
 	started := false
