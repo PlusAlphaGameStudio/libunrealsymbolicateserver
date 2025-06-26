@@ -132,12 +132,20 @@ type CrashContextResult struct {
 }
 
 func unzipUsing7zAndFindRipper(zipPath string) (string, error) {
-	tmpDir := os.TempDir()
+	if len(zipPath) == 0 {
+		return "", errors.New("empty zipPath")
+	}
+
+	tmpDir, err := os.MkdirTemp(os.TempDir(), "libunrealsymbolicateserver-ios-*")
+	if err != nil {
+		return "", err
+	}
+
 	subProcess := exec.Command(platform.GetSevenZipExePath(), "e", "-y", "-o"+tmpDir, zipPath)
 	subProcess.Stdout = os.Stdout
 
 	log.Println("Running external command: " + subProcess.String())
-	err := subProcess.Start()
+	err = subProcess.Start()
 	if err != nil {
 		return "", err
 	}
@@ -145,6 +153,8 @@ func unzipUsing7zAndFindRipper(zipPath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	log.Println("Unzipped to " + tmpDir)
 
 	// 압축 해제된 파일들 중 'Ripper' 이름을 가진 파일을 재귀적으로 찾기
 	var ripperPath string

@@ -39,7 +39,8 @@ func main() {
 		panic(errors.New("error loading .env file"))
 	}
 
-	selfTest()
+	selfTest("samples/testTombstone")
+	selfTest("samples/LastUnhandledCrashStack.xml")
 
 	router := gin.Default()
 	// Set a lower memory limit for multipart forms (default is 32 MiB)
@@ -124,7 +125,7 @@ func symbolicate(uploadBytes []byte) ([]byte, error) {
 	if strings.Contains(string(uploadBytes), "<PlatformName>IOS</PlatformName>") {
 		return symbolicateIos(uploadBytes)
 	}
-	
+
 	// Default to Android symbolication
 	return symbolicateAndroid(uploadBytes)
 }
@@ -170,7 +171,12 @@ func symbolicateAndroid(uploadBytes []byte) ([]byte, error) {
 
 	buildId := findBuildId(uploadBytes)
 
-	libUnrealPath := strings.ReplaceAll(os.Getenv("LIB_UNREAL_PATH"), "{BuildNumber}", strconv.FormatInt(buildNumber, 10))
+	var libUnrealPath string
+	if buildNumber > 0 {
+		libUnrealPath = strings.ReplaceAll(os.Getenv("LIB_UNREAL_PATH"), "{BuildNumber}", strconv.FormatInt(buildNumber, 10))
+	} else {
+		libUnrealPath = strings.ReplaceAll(os.Getenv("LIB_UNREAL_PATH"), "{BuildNumber}", "")
+	}
 
 	libZipPath := recursivelyFindLibZipPathByBuildId(libUnrealPath, buildId)
 
@@ -215,8 +221,8 @@ func symbolicateAndroid(uploadBytes []byte) ([]byte, error) {
 	return outBytes, nil
 }
 
-func selfTest() {
-	testTombstoneBytes, err := os.ReadFile("testTombstone")
+func selfTest(samplePath string) {
+	testTombstoneBytes, err := os.ReadFile(samplePath)
 	if err != nil {
 		log.Println(err)
 	}
@@ -230,6 +236,10 @@ func selfTest() {
 }
 
 func unzipUsing7z(zipPath string) (string, error) {
+	if len(zipPath) == 0 {
+		return "", errors.New("empty zipPath")
+	}
+
 	tmpDir := os.TempDir()
 	subProcess := exec.Command(platform.GetSevenZipExePath(), "e", "-y", "-o"+tmpDir, zipPath)
 	subProcess.Stdout = os.Stdout

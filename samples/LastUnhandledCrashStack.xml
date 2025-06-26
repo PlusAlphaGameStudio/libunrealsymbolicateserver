@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FGenericCrashContext>
+<RuntimeProperties>
+<CrashVersion>3</CrashVersion>
+<ExecutionGuid>BCE333735F4F0565099B2C8C4D0FC47B</ExecutionGuid>
+<CrashGUID>UECC-IOS-BE158C204743B19F615106ACB2EE2052_0001</CrashGUID>
+<IsEnsure>false</IsEnsure>
+<IsStall>false</IsStall>
+<IsAssert>false</IsAssert>
+<CrashType>Crash</CrashType>
+<ErrorMessage>Caught signal</ErrorMessage>
+<CrashReporterMessage></CrashReporterMessage>
+<CrashReporterMessage>Attended</CrashReporterMessage>
+<ProcessId>0</ProcessId>
+<SecondsSinceStart>394</SecondsSinceStart>
+<IsInternalBuild>false</IsInternalBuild>
+<IsPerforceBuild>false</IsPerforceBuild>
+<IsWithDebugInfo>false</IsWithDebugInfo>
+<IsSourceDistribution>false</IsSourceDistribution>
+<GameName>UE-Ripper</GameName>
+<ExecutableName>Ripper</ExecutableName>
+<BuildConfiguration>Development</BuildConfiguration>
+<GameSessionID></GameSessionID>
+<PlatformName>IOS</PlatformName>
+<PlatformFullName>IOS</PlatformFullName>
+<PlatformNameIni>IOS</PlatformNameIni>
+<EngineMode>Game</EngineMode>
+<EngineModeEx>Unset</EngineModeEx>
+<DeploymentName></DeploymentName>
+<EngineVersion>5.4.4-0+UE5</EngineVersion>
+<EngineCompatibleVersion>5.4.4-0+UE5</EngineCompatibleVersion>
+<CommandLine></CommandLine>
+<LanguageLCID>0</LanguageLCID>
+<AppDefaultLocale>en-KR</AppDefaultLocale>
+<BuildVersion>UE5-CL-0</BuildVersion>
+<Symbols>UE5-CL-0-IOS-Development</Symbols>
+<IsUERelease>false</IsUERelease>
+<IsRequestingExit>false</IsRequestingExit>
+<UserName></UserName>
+<BaseDir></BaseDir>
+<RootDir>../../../</RootDir>
+<MachineId>F50FD8C6BE4F19B84A4C3CBF290E7845</MachineId>
+<LoginId>f50fd8c6be4f19b84a4c3cbf290e7845</LoginId>
+<EpicAccountId></EpicAccountId>
+<SourceContext></SourceContext>
+<UserDescription></UserDescription>
+<UserActivityHint></UserActivityHint>
+<CrashDumpMode>0</CrashDumpMode>
+<GameStateName></GameStateName>
+<Misc.NumberOfCores>6</Misc.NumberOfCores>
+<Misc.NumberOfCoresIncludingHyperthreads>6</Misc.NumberOfCoresIncludingHyperthreads>
+<Misc.Is64bitOperatingSystem>1</Misc.Is64bitOperatingSystem>
+<Misc.CPUVendor>Apple</Misc.CPUVendor>
+<Misc.CPUBrand>iPhone14,4</Misc.CPUBrand>
+<Misc.PrimaryGPUBrand>GenericGPUBrand</Misc.PrimaryGPUBrand>
+<Misc.OSVersionMajor>IOS</Misc.OSVersionMajor>
+<Misc.OSVersionMinor>18.5.0</Misc.OSVersionMinor>
+<Misc.AnticheatProvider></Misc.AnticheatProvider>
+<MemoryStats.TotalPhysical>2189278872</MemoryStats.TotalPhysical>
+<MemoryStats.TotalVirtual>3042377728</MemoryStats.TotalVirtual>
+<MemoryStats.PageSize>16384</MemoryStats.PageSize>
+<MemoryStats.TotalPhysicalGB>4</MemoryStats.TotalPhysicalGB>
+<MemoryStats.AvailablePhysical>0</MemoryStats.AvailablePhysical>
+<MemoryStats.AvailableVirtual>0</MemoryStats.AvailableVirtual>
+<MemoryStats.UsedPhysical>0</MemoryStats.UsedPhysical>
+<MemoryStats.PeakUsedPhysical>0</MemoryStats.PeakUsedPhysical>
+<MemoryStats.UsedVirtual>0</MemoryStats.UsedVirtual>
+<MemoryStats.PeakUsedVirtual>0</MemoryStats.PeakUsedVirtual>
+<MemoryStats.bIsOOM>0</MemoryStats.bIsOOM>
+<MemoryStats.OOMAllocationSize>0</MemoryStats.OOMAllocationSize>
+<MemoryStats.OOMAllocationAlignment>0</MemoryStats.OOMAllocationAlignment>
+<NumMinidumpFramesToIgnore>0</NumMinidumpFramesToIgnore>
+<CallStack></CallStack>
+<PCallStack>
+             Ripper 0x0000000104d7c000 + 6994e8          
+             Ripper 0x0000000104d7c000 + 5bafc8          
+             Ripper 0x0000000104d7c000 + 7f029dc         
+             Ripper 0x0000000104d7c000 + 80c18c          
+             Ripper 0x0000000104d7c000 + 1d2e20          
+             Ripper 0x0000000104d7c000 + 1cf2c8          
+             Ripper 0x0000000104d7c000 + 1cf22c          
+ CollectionViewCore 0x0000000211ed8000 + 192fa08         
+ CollectionViewCore 0x0000000211ed8000 + 19dfc60         
+          UIKitCore 0x000000018ba90000 + 57582d0         
+             Ripper 0x0000000104d7c000 + 6a4160          
+             Ripper 0x0000000104d7c000 + 800644          
+             Ripper 0x0000000104d7c000 + 8de9a8          
+             Ripper 0x0000000104d7c000 + 844600          
+             Ripper 0x0000000104d7c000 + 7e2deb0         
+             Ripper 0x0000000104d7c000 + 7e88758         
+             Ripper 0x0000000104d7c000 + 7e60480         
+             Ripper 0x0000000104d7c000 + 6f203a4         
+             Ripper 0x0000000104d7c000 + 6fb0704         
+             Ripper 0x0000000104d7c000 + 6f9fb48         
+             Ripper 0x0000000104d7c000 + 6f90fd8         
+             Ripper 0x0000000104d7c000 + 7e2d3a8         
+             Ripper 0x0000000104d7c000 + 7e87ce0         
+             Ripper 0x0000000104d7c000 + 7e862e8         
+             Ripper 0x0000000104d7c000 + 7e86bdc         
+             Ripper 0x0000000104d7c000 + 7e3efe4         
+             Ripper 0x0000000104d7c000 + 64bc8b0         
+             Ripper 0x0000000104d7c000 + 64bba04         
+             Ripper 0x0000000104d7c000 + 64ba110         
+             Ripper 0x0000000104d7c000 + 64b9e14         
+             Ripper 0x0000000104d7c000 + 64b7b60         
+             Ripper 0x0000000104d7c000 + 4e4db04         
+             Ripper 0x0000000104d7c000 + 5e1fe00         
+             Ripper 0x0000000104d7c000 + 5e1f88c         
+             Ripper 0x0000000104d7c000 + 5e0918          
+             Ripper 0x0000000104d7c000 + 5df424          
+             Ripper 0x0000000104d7c000 + 5e18ee0         
+             Ripper 0x0000000104d7c000 + 5e13280         
+             Ripper 0x0000000104d7c000 + 548e9d0         
+             Ripper 0x0000000104d7c000 + 51f0844         
+             Ripper 0x0000000104d7c000 + 670feac         
+             Ripper 0x0000000104d7c000 + 11b40c8         
+         Foundation 0x0000000187e1b000 + 75804           
+ CollectionViewCore 0x0000000211ed8000 + 19db344         
+ CollectionViewCore 0x0000000211ed8000 + 19d8ab8         
+</PCallStack>
+<PCallStackHash>EAA17EC12CB7C00637CC8B2A88589FE7E4FE0C83</PCallStackHash>
+</RuntimeProperties>
+<PlatformProperties>
+<AdditionalSystemSymbolsVersion>[IOS 18.5.0 64b]</AdditionalSystemSymbolsVersion>
+<PlatformCallbackResult>0</PlatformCallbackResult>
+<CrashTrigger>0</CrashTrigger>
+</PlatformProperties>
+<EngineData>
+<MatchingDPStatus>iPhone13MiniNo errors</MatchingDPStatus>
+<RHI.RHIName>Metal_ES31</RHI.RHIName>
+<RHI.AdapterName>Metal</RHI.AdapterName>
+<RHI.FeatureLevel>ES3_1</RHI.FeatureLevel>
+<RHI.GPUVendor>Unknown</RHI.GPUVendor>
+<RHI.DeviceId>0004</RHI.DeviceId>
+<DeviceProfile.Name>iPhone13Mini</DeviceProfile.Name>
+</EngineData>
+<GameData>
+<RipperBuildNumber>2045 Dev</RipperBuildNumber>
+<RipperBuildDate>2025-06-24 12:50:12</RipperBuildDate>
+<RipperVersion>0.6</RipperVersion>
+<LibUnrealBuildID>C6F57CCE-A15E-30D9-A154-50BD91207CB8</LibUnrealBuildID>
+</GameData>
+</FGenericCrashContext>

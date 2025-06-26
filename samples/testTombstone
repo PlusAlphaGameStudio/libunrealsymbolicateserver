@@ -1,0 +1,54 @@
+*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+Build fingerprint: 'samsung/e1sksx/e1s:14/UP1A.231005.007/S921NKSS5AYB1:user/release-keys'
+Revision: '17'
+ABI: 'arm64'
+Processor: '6'
+Timestamp: 2025-03-19 10:49:59.332574261+0900
+Process uptime: 90s
+Cmdline: top.plusalpha.ripper
+pid: 13097, tid: 13241, name: GameThread  >>> top.plusalpha.ripper <<<
+uid: 10611
+tagged_addr_ctrl: 0000000000000001 (PR_TAGGED_ADDR_ENABLE)
+pac_enabled_keys: 000000000000000f (PR_PAC_APIAKEY, PR_PAC_APIBKEY, PR_PAC_APDAKEY, PR_PAC_APDBKEY)
+signal 11 (SIGSEGV), code -6 (SI_TKILL), fault addr --------
+    x0  dddddddddddddddd  x1  0000000000000000  x2  0000000000000008  x3  0000000000000000
+    x4  0000006afebe5130  x5  0000006afebe5108  x6  0000000153000016  x7  0000000153000016
+    x8  dddddddddddddddd  x9  dddddddddddddddd  x10 0000006b8eec97fc  x11 00000000000001dc
+    x12 0000000000000005  x13 0000000000000002  x14 0000000187000021  x15 0000000153000016
+    x16 0000000000000004  x17 0000000000000002  x18 00000000fffffcf8  x19 0000006b0cf5f4c0
+    x20 0000006b0cf5f5f0  x21 0000006b0cf5f5f0  x22 0000000000000001  x23 0000006b0c64c6c8
+    x24 0000006bab477000  x25 0000006bab477000  x26 0000006b8ec24bcf  x27 0000000000000000
+    x28 0000006b0c64c5c0  x29 0000006bab470db8
+    lr  0000006b99a0c010  sp  0000006bab470cc0  pc  0000006b99a0c01c  pst 00000000a0001000
+
+11 total frames
+backtrace:
+      #00 pc 0000000011bfc01c  /data/app/~~36X5uXJu4u54AQD_SFtvVQ==/top.plusalpha.ripper-9D_AnEX8sOyxHH-off443w==/lib/arm64/libUnreal.so (UNPCBehaviorComponent::OnMoveToCoverForRanged(FString const&)+332) (BuildId: f7dda47241ed05630db4fb766057f679a7753099)
+      #01 pc 000000000f86a654  /data/app/~~36X5uXJu4u54AQD_SFtvVQ==/top.plusalpha.ripper-9D_AnEX8sOyxHH-off443w==/lib/arm64/libUnreal.so (FTimerUnifiedDelegate::Execute()+544) (BuildId: f7dda47241ed05630db4fb766057f679a7753099)
+      #02 pc 000000000f8697a4  /data/app/~~36X5uXJu4u54AQD_SFtvVQ==/top.plusalpha.ripper-9D_AnEX8sOyxHH-off443w==/lib/arm64/libUnreal.so (FTimerManager::Tick(float)+2408) (BuildId: f7dda47241ed05630db4fb766057f679a7753099)
+      #03 pc 000000000ecddbec  /data/app/~~36X5uXJu4u54AQD_SFtvVQ==/top.plusalpha.ripper-9D_AnEX8sOyxHH-off443w==/lib/arm64/libUnreal.so (UWorld::Tick(ELevelTick, float)+18684) (BuildId: f7dda47241ed05630db4fb766057f679a7753099)
+      #04 pc 000000000e9dc500  /data/app/~~36X5uXJu4u54AQD_SFtvVQ==/top.plusalpha.ripper-9D_AnEX8sOyxHH-off443w==/lib/arm64/libUnreal.so (UGameEngine::Tick(float, bool)+4244) (BuildId: f7dda47241ed05630db4fb766057f679a7753099)
+      #05 pc 0000000010371a24  /data/app/~~36X5uXJu4u54AQD_SFtvVQ==/top.plusalpha.ripper-9D_AnEX8sOyxHH-off443w==/lib/arm64/libUnreal.so (FEngineLoop::Tick()+27712) (BuildId: f7dda47241ed05630db4fb766057f679a7753099)
+      #06 pc 000000001036931c  /data/app/~~36X5uXJu4u54AQD_SFtvVQ==/top.plusalpha.ripper-9D_AnEX8sOyxHH-off443w==/lib/arm64/libUnreal.so (AndroidMain(android_app*)+4028) (BuildId: f7dda47241ed05630db4fb766057f679a7753099)
+      #07 pc 00000000103797fc  /data/app/~~36X5uXJu4u54AQD_SFtvVQ==/top.plusalpha.ripper-9D_AnEX8sOyxHH-off443w==/lib/arm64/libUnreal.so (android_main+200) (BuildId: f7dda47241ed05630db4fb766057f679a7753099)
+      #08 pc 00000000103a0b24  /data/app/~~36X5uXJu4u54AQD_SFtvVQ==/top.plusalpha.ripper-9D_AnEX8sOyxHH-off443w==/lib/arm64/libUnreal.so (BuildId: f7dda47241ed05630db4fb766057f679a7753099)
+      #09 pc 00000000000cba28  /apex/com.android.runtime/lib64/bionic/libc.so (__pthread_start(void*)+208) (BuildId: 6fbd0d7c6e3abc50de22e2fa6d2d6513)
+      #10 pc 00000000000683b0  /apex/com.android.runtime/lib64/bionic/libc.so (__start_thread+64) (BuildId: 6fbd0d7c6e3abc50de22e2fa6d2d6513)
+
+memory near x4:
+    0000006afebe5110 0000000153000016 0000000159000018  ...S.......Y....
+    0000006afebe5120 000000014f000013 0000000153000016  ...O.......S....
+    0000006afebe5130 000000017b000028 0000000159000018  (..{.......Y....
+    0000006afebe5140 0000000180000029 000000014f000013  )..........O....
+    0000006afebe5150 000000014f000013 000000017c000009  ...O.......|....
+    0000006afebe5160 000000017b000028 0000000180000029  (..{....).......
+    0000006afebe5170 000000018100000f 0000000178000003  ...........x....
+    0000006afebe5180 0000000178000003 00000000c7000012  ...x............
+    0000006afebe5190 00000000ec000029 00000000c7000012  )...............
+    0000006afebe51a0 0000000004000002 00000000c7000012  ................
+    0000006afebe51b0 00000000f0000017 00000000f1000028  ........(.......
+    0000006afebe51c0 00000000f1000028 00000000a6000021  (.......!.......
+    0000006afebe51d0 00000000d1000026 00000000b700000f  &...............
+    0000006afebe51e0 00000000d700000b 00000000e0000013  ................
+    0000006afebe51f0 00000000ee000005 0000000004000002  ................
+    0000006afebe5200 00000000e300001c 00000000dd000022  ........".......
