@@ -9,6 +9,10 @@ func GetAddr2lineExePath() string {
 	return replaceHome(addr2lineExePath)
 }
 
+func GetXCRunExePath() string {
+	panic("Not supported")
+}
+
 func GetSevenZipExePath() string {
 	return replaceHome(sevenZipExePath)
 }

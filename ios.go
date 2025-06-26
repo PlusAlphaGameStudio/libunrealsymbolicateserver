@@ -3,11 +3,13 @@ package main
 import (
 	"bytes"
 	"encoding/xml"
+	"errors"
 	"io"
 	"libunrealsymbolicateserver/platform"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -129,59 +131,63 @@ type CrashContextResult struct {
 	CallStackEntries  []CallStackEntry
 }
 
+func unzipUsing7zAndFindRipper(zipPath string) (string, error) {
+	tmpDir := os.TempDir()
+	subProcess := exec.Command(platform.GetSevenZipExePath(), "e", "-y", "-o"+tmpDir, zipPath)
+	subProcess.Stdout = os.Stdout
+
+	log.Println("Running external command: " + subProcess.String())
+	err := subProcess.Start()
+	if err != nil {
+		return "", err
+	}
+	err = subProcess.Wait()
+	if err != nil {
+		return "", err
+	}
+
+	// 압축 해제된 파일들 중 'Ripper' 이름을 가진 파일을 재귀적으로 찾기
+	var ripperPath string
+	err = filepath.Walk(tmpDir, func(filePath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && info.Name() == "Ripper" {
+			ripperPath = filePath
+			return filepath.SkipDir // 찾았으므로 더 이상 검색하지 않음
+		}
+		return nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if ripperPath == "" {
+		return "", errors.New("'Ripper' file not found in extracted files")
+	}
+
+	return ripperPath, nil
+}
+
 func symbolicateIos(uploadBytes []byte) ([]byte, error) {
-	var buildNumber int64
-	var addrLines []string
-	started := false
-	for _, line := range strings.Split(string(uploadBytes), "\n") {
-		added := false
-		if strings.HasPrefix(line, " libUnreal ") {
-			addrLines = append(addrLines, strings.Split(line, " + ")[1])
-		} else if strings.Contains(line, "/libUnreal.so") {
-			lineTokens := strings.Fields(strings.Trim(line, " "))
-			if len(lineTokens) >= 4 {
-				if strings.HasSuffix(lineTokens[3], "/libUnreal.so") {
-					addrLines = append(addrLines, lineTokens[2])
-					added = true
-					started = true
-				}
-			}
-		}
-
-		// 주소 한 뭉텅이가 다 처리됐으면 그 다음은 다 무시한다.
-		if added == false && started == true {
-			break
-		}
-
-		if strings.HasPrefix(line, "<RipperBuildNumber>") {
-			// '1234 Dev' 또는 '4567 Shi' 등의 값이다. 숫자만 뽑아 온다.
-			buildNumberStr := strings.Split(line[len("<RipperBuildNumber>"):], " ")[0]
-			if _, err := strconv.ParseInt(buildNumberStr, 10, 32); err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	log.Println("=== Filtered address lines begin ===")
-	for _, l := range addrLines {
-		log.Println(l)
-	}
-	log.Println("=== Filtered address lines end ===")
-
-	buildId := findBuildId(uploadBytes)
-
-	libUnrealPath := strings.ReplaceAll(os.Getenv("LIB_UNREAL_PATH"), "{BuildNumber}", strconv.FormatInt(buildNumber, 10))
-
-	libZipPath := recursivelyFindLibZipPathByBuildId(libUnrealPath, buildId)
-
-	extractedLibPath, err := unzipUsing7z(libZipPath)
+	crashResult, err := parseFGenericCrashContext(uploadBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Println("libUnreal path found: " + extractedLibPath)
+	libUnrealPath := strings.ReplaceAll(os.Getenv("LIB_UNREAL_PATH"), "{BuildNumber}", strconv.Itoa(crashResult.RipperBuildNumber))
 
-	subProcess := exec.Command(platform.GetAddr2lineExePath(), "-C", "-f", "-e", extractedLibPath)
+	libZipPath := recursivelyFindDsymZipPathByBuildId(libUnrealPath, crashResult.LibUnrealBuildID)
+
+	ripperBinPath, err := unzipUsing7zAndFindRipper(libZipPath)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Println("libUnreal path found: " + ripperBinPath)
+
+	subProcess := exec.Command(platform.GetXCRunExePath(), "atos", "-o", ripperBinPath, "-arch", "arm64", "-l")
 	stdinPipe, err := subProcess.StdinPipe()
 	if err != nil {
 		return nil, err
@@ -196,8 +202,16 @@ func symbolicateIos(uploadBytes []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	for _, line := range addrLines {
-		if _, err := io.WriteString(stdinPipe, line+"\n"); err != nil {
+	for _, entry := range crashResult.CallStackEntries {
+		var inputLine string
+		if entry.ModuleName == "Ripper" {
+			address := entry.BaseAddress + entry.Offset
+			inputLine = strconv.FormatInt(address, 16)
+		} else {
+			inputLine = "?"
+		}
+
+		if _, err := io.WriteString(stdinPipe, inputLine+"\n"); err != nil {
 			return nil, err
 		}
 	}
@@ -265,4 +279,21 @@ func parseFGenericCrashContext(xmlData []byte) (*CrashContextResult, error) {
 	}
 
 	return result, nil
+}
+
+func recursivelyFindDsymZipPathByBuildId(basePath string, buildId string) string {
+	files, err := glob(basePath, ".7z")
+	if err != nil {
+		panic(err)
+	}
+
+	for _, g := range files {
+		// 찾아야 되는 파일명의 예시는...
+		// Ripper-dSYM-C6F57CCE-A15E-30D9-A154-50BD91207CB8.7z
+		if strings.Contains(g, "Ripper-dSYM-"+buildId+".7z") {
+			return g
+		}
+	}
+
+	return ""
 }
