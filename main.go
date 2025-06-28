@@ -40,6 +40,7 @@ func main() {
 	}
 
 	selfTest("samples/testTombstone")
+	selfTest("samples/LastUnhandledCrashStack-Android.xml")
 	selfTest("samples/LastUnhandledCrashStack.xml")
 
 	router := gin.Default()
@@ -133,6 +134,8 @@ func symbolicate(uploadBytes []byte) ([]byte, error) {
 func symbolicateAndroid(uploadBytes []byte) ([]byte, error) {
 	var buildNumber int64
 	var addrLines []string
+	var libUnrealBuildID string
+
 	started := false
 	for _, line := range strings.Split(string(uploadBytes), "\n") {
 		added := false
@@ -157,9 +160,17 @@ func symbolicateAndroid(uploadBytes []byte) ([]byte, error) {
 		if strings.HasPrefix(line, "<RipperBuildNumber>") {
 			// '1234 Dev' 또는 '4567 Shi' 등의 값이다. 숫자만 뽑아 온다.
 			buildNumberStr := strings.Split(line[len("<RipperBuildNumber>"):], " ")[0]
-			if _, err := strconv.ParseInt(buildNumberStr, 10, 32); err != nil {
+			var err error
+			if buildNumber, err = strconv.ParseInt(buildNumberStr, 10, 32); err != nil {
 				return nil, err
 			}
+		}
+
+		if strings.HasPrefix(line, "<LibUnrealBuildID>") {
+			// <LibUnrealBuildID>xxxxx</LibUnrealBuildID> 중 xxxxx 부분 뽑아온다.
+			line = strings.TrimSpace(line)
+			libUnrealBuildID = line[len("<LibUnrealBuildID>") : len(line)-len("</LibUnrealBuildID>")]
+
 		}
 	}
 
@@ -169,7 +180,11 @@ func symbolicateAndroid(uploadBytes []byte) ([]byte, error) {
 	}
 	log.Println("=== Filtered address lines end ===")
 
-	buildId := findBuildId(uploadBytes)
+	// 혹시 tombstone이면 libUnrealBuildID 아직 비어있을 것이다.
+	// 채우기 시도한다.
+	if len(libUnrealBuildID) == 0 {
+		libUnrealBuildID = findBuildIdFromTombstone(uploadBytes)
+	}
 
 	var libUnrealPath string
 	if buildNumber > 0 {
@@ -178,7 +193,7 @@ func symbolicateAndroid(uploadBytes []byte) ([]byte, error) {
 		libUnrealPath = strings.ReplaceAll(os.Getenv("LIB_UNREAL_PATH"), "{BuildNumber}", "")
 	}
 
-	libZipPath := recursivelyFindLibZipPathByBuildId(libUnrealPath, buildId)
+	libZipPath := recursivelyFindLibZipPathByBuildId(libUnrealPath, libUnrealBuildID)
 
 	extractedLibPath, err := unzipUsing7z(libZipPath)
 	if err != nil {
@@ -262,10 +277,11 @@ func unzipUsing7z(zipPath string) (string, error) {
 	return path.Join(tmpDir, "Ripper-arm64.so"), nil
 }
 
-func findBuildId(uploadBytes []byte) string {
+func findBuildIdFromTombstone(uploadBytes []byte) string {
 	// 아래와 같은 행에서 BuildId 값을 뽑아낸다.
 	// 이 경우에는 f7dda47241ed05630db4fb766057f679a7753099를 뽑아낸다.
 
+	// tombstone인 경우에는 다음과 같다.
 	// "#08 pc 00000000103a0b24  /data/app/~~36X5uXJu4u54AQD_SFtvVQ==/top.plusalpha.ripper-9D_AnEX8sOyxHH-off443w==/lib/arm64/libUnreal.so (BuildId: f7dda47241ed05630db4fb766057f679a7753099)
 
 	for _, line := range strings.Split(string(uploadBytes), "\n") {
@@ -297,6 +313,9 @@ func glob(dir string, ext string) ([]string, error) {
 // basePath 및 하위 디렉토리를 재귀적으로 탐색해서 buildId에 해당하는
 // 심볼 파일의 압축 버전 경로를 반환한다.
 func recursivelyFindLibZipPathByBuildId(basePath string, buildId string) string {
+	suffix := "-" + buildId + ".7z"
+	log.Printf("Recursively finding a file from '" + basePath + "' with suffix '" + suffix + "'...")
+
 	files, err := glob(basePath, ".7z")
 	if err != nil {
 		panic(err)
@@ -305,7 +324,7 @@ func recursivelyFindLibZipPathByBuildId(basePath string, buildId string) string 
 	for _, g := range files {
 		// 찾아야 되는 파일명의 예시는...
 		// Ripper-arm64-f7dda47241ed05630db4fb766057f679a7753099.7z
-		if strings.HasSuffix(g, "-"+buildId+".7z") {
+		if strings.HasSuffix(g, suffix) {
 			return g
 		}
 	}
