@@ -18,8 +18,10 @@ func GetSevenZipExePath() string {
 	return replaceHome(sevenZipExePath)
 }
 
-func SelfTest(selfTest selfTestSingleFunc) {
-	selfTest("samples/testTombstone")
-	selfTest("samples/LastUnhandledCrashStack-Android.xml")
-	selfTest("samples/LastUnhandledCrashStack-IOS.xml")
+func SelfTest(selfTestSingle selfTestSingleFunc) {
+	selfTestSingle("samples/testTombstone")
+	selfTestSingle("samples/LastUnhandledCrashStack-Android.xml")
+	selfTestSingle("samples/LastCrashStack-Android.txt")
+
+	selfTestSingle("samples/LastUnhandledCrashStack-IOS.xml")
 }

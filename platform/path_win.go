@@ -20,6 +20,8 @@ func GetSevenZipExePath() string {
 func ExecuteBatchSelfTests(selfTestSingle selfTestSingleFunc) {
 	selfTestSingle("samples/testTombstone")
 	selfTestSingle("samples/LastUnhandledCrashStack-Android.xml")
+	selfTestSingle("samples/LastCrashStack-Android.txt")
+
 	// Windows 환경에서는 IOS 분석 할 수 없다.
 	//selfTestSingle("samples/LastUnhandledCrashStack-IOS.xml")
 }

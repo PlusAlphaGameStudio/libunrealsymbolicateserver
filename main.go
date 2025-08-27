@@ -148,6 +148,15 @@ func symbolicateAndroid(uploadBytes []byte) ([]byte, error) {
 					started = true
 				}
 			}
+		} else if strings.Contains(line, "libUnreal.so(") {
+			lineTokens := strings.Fields(strings.Trim(line, " "))
+			if len(lineTokens) >= 2 {
+				iBeg := strings.Index(lineTokens[1], "(")
+				iEnd := strings.Index(lineTokens[1], ")")
+				if iBeg >= 0 && iEnd >= 0 {
+					addrLines = append(addrLines, lineTokens[1][iBeg+1:iEnd])
+				}
+			}
 		}
 
 		// 주소 한 뭉텅이가 다 처리됐으면 그 다음은 다 무시한다.
@@ -182,6 +191,12 @@ func symbolicateAndroid(uploadBytes []byte) ([]byte, error) {
 	// 채우기 시도한다.
 	if len(libUnrealBuildID) == 0 {
 		libUnrealBuildID = findBuildIdFromTombstone(uploadBytes)
+	}
+
+	// 그래도 안채워져있으면 가장 단순한 형태인 LastCrashStack.txt 일 것이다.
+	// 이것도 아니면 말고...
+	if len(libUnrealBuildID) == 0 {
+		libUnrealBuildID = findBuildIdFromTxt(uploadBytes)
 	}
 
 	var libUnrealPath string
@@ -234,10 +249,19 @@ func symbolicateAndroid(uploadBytes []byte) ([]byte, error) {
 	return outBytes, nil
 }
 
+func findBuildIdFromTxt(uploadBytes []byte) string {
+	for _, line := range strings.Split(string(uploadBytes), "\n") {
+		if strings.HasPrefix(line, "Build ID: ") {
+			return strings.TrimSpace(line[len("Build ID: "):])
+		}
+	}
+	return ""
+}
+
 func selfTestSingle(samplePath string) {
 	sampleBytes, err := os.ReadFile(samplePath)
 	if err != nil {
-		log.Println(err)
+		log.Fatalf(err.Error())
 		return
 	}
 
@@ -255,7 +279,7 @@ func selfTestSingle(samplePath string) {
 
 func unzipUsing7z(zipPath string) (string, error) {
 	if len(zipPath) == 0 {
-		return "", errors.New("empty zipPath")
+		return "", errors.New("empty zipPath 1")
 	}
 
 	tmpDir := os.TempDir()

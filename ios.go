@@ -133,7 +133,7 @@ type CrashContextResult struct {
 
 func unzipUsing7zAndFindRipper(zipPath string) (string, error) {
 	if len(zipPath) == 0 {
-		return "", errors.New("empty zipPath")
+		return "", errors.New("empty zipPath 2")
 	}
 
 	tmpDir, err := os.MkdirTemp(os.TempDir(), "libunrealsymbolicateserver-ios-*")
@@ -254,20 +254,20 @@ func symbolicateIos(uploadBytes []byte) ([]byte, error) {
 	}
 
 	outBytes := outBytesBuffer.Bytes()
-	
+
 	// Process output: split each line into two lines
 	outStr := string(outBytes)
 	lines := strings.Split(outStr, "\n")
 	var processedLines []string
-	
+
 	for _, line := range lines {
 		if line == "" {
 			continue
 		}
-		
+
 		// Add the original line
 		processedLines = append(processedLines, line)
-		
+
 		// Check if line ends with (filename:linenumber) pattern
 		if strings.HasSuffix(line, ")") {
 			// Find the last occurrence of " ("
@@ -284,7 +284,7 @@ func symbolicateIos(uploadBytes []byte) ([]byte, error) {
 			processedLines = append(processedLines, "?")
 		}
 	}
-	
+
 	processedOutput := strings.Join(processedLines, "\n")
 	return []byte(processedOutput), nil
 }
