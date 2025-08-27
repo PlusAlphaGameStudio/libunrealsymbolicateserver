@@ -39,9 +39,7 @@ func main() {
 		panic(errors.New("error loading .env file"))
 	}
 
-	selfTest("samples/testTombstone")
-	selfTest("samples/LastUnhandledCrashStack-Android.xml")
-	selfTest("samples/LastUnhandledCrashStack.xml")
+	platform.ExecuteBatchSelfTests(selfTestSingle)
 
 	router := gin.Default()
 	// Set a lower memory limit for multipart forms (default is 32 MiB)
@@ -236,7 +234,7 @@ func symbolicateAndroid(uploadBytes []byte) ([]byte, error) {
 	return outBytes, nil
 }
 
-func selfTest(samplePath string) {
+func selfTestSingle(samplePath string) {
 	sampleBytes, err := os.ReadFile(samplePath)
 	if err != nil {
 		log.Println(err)

@@ -16,3 +16,10 @@ func GetXCRunExePath() string {
 func GetSevenZipExePath() string {
 	return replaceHome(sevenZipExePath)
 }
+
+func ExecuteBatchSelfTests(selfTestSingle selfTestSingleFunc) {
+	selfTestSingle("samples/testTombstone")
+	selfTestSingle("samples/LastUnhandledCrashStack-Android.xml")
+	// Windows 환경에서는 IOS 분석 할 수 없다.
+	//selfTestSingle("samples/LastUnhandledCrashStack-IOS.xml")
+}

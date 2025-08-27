@@ -17,3 +17,9 @@ func GetXCRunExePath() string {
 func GetSevenZipExePath() string {
 	return replaceHome(sevenZipExePath)
 }
+
+func SelfTest(selfTest selfTestSingleFunc) {
+	selfTest("samples/testTombstone")
+	selfTest("samples/LastUnhandledCrashStack-Android.xml")
+	selfTest("samples/LastUnhandledCrashStack-IOS.xml")
+}
